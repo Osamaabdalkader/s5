@@ -10,6 +10,7 @@ const CONFIG = {
         'register': 'register.html',
         'profile': 'profile.html',
         'post-details': 'post-details.html',
+        'notifications': 'notifications.html',
         'groups': 'groups.html',
         'cart': 'cart.html',
         'support': 'support.html'
