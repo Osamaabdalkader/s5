@@ -3,6 +3,10 @@ class Navigation {
     static async showPage(pageId, params = {}) {
         console.log(`جاري تحميل الصفحة: ${pageId}`, params);
         
+        // إخفاء جميع الصفحات أولاً
+        const pages = document.querySelectorAll('.page');
+        pages.forEach(page => page.classList.remove('active'));
+        
         // إظهار رسالة تحميل
         document.getElementById('dynamic-content').innerHTML = `
             <div class="loading-page">
@@ -41,11 +45,12 @@ class Navigation {
                 this.handleProfilePage();
                 break;
             case 'home':
-                Posts.loadPosts();
+                await HomePage.init(); // استخدام HomePage بدلاً من Posts
                 break;
             case 'post-details':
                 this.handlePostDetailsPage(params);
                 break;
+            case 'notifications':
             case 'groups':
             case 'cart':
             case 'support':
@@ -53,16 +58,11 @@ class Navigation {
                 break;
         }
         
-        // إعادة ربط الأحداث بعد تهيئة الصفحة
         this.rebindPageEvents(pageId);
     }
 
-    // إعادة ربط الأحداث الخاصة بالصفحة
     static rebindPageEvents(pageId) {
         console.log(`إعادة ربط أحداث الصفحة: ${pageId}`);
-        
-        // هذه الوظيفة تتعامل مع أي أحداث خاصة تحتاج إلى ربط يدوي
-        // الأحداث الرئيسية تتم معالجتها عبر النظام العالمي في App.js
     }
 
     static handlePublishPage() {
@@ -81,7 +81,6 @@ class Navigation {
     }
 
     static handleLoginPage() {
-        // تنظيف رسائل الحالة عند تحميل الصفحة
         const statusEl = document.getElementById('login-status');
         if (statusEl) {
             statusEl.style.display = 'none';
@@ -89,7 +88,6 @@ class Navigation {
     }
 
     static handleRegisterPage() {
-        // تنظيف رسائل الحالة عند تحميل الصفحة
         const statusEl = document.getElementById('register-status');
         if (statusEl) {
             statusEl.style.display = 'none';
@@ -121,8 +119,8 @@ class Navigation {
     }
 
     static handleComingSoonPage(pageId) {
-        // الصفحات التي قيد التطوير
         const pageTitles = {
+            'notifications': 'الإشعارات',
             'groups': 'مجموعتي',
             'cart': 'سلة التسوق',
             'support': 'الدعم الفني'
@@ -148,6 +146,7 @@ class Navigation {
 
     static getPageIcon(pageId) {
         const icons = {
+            'notifications': 'fa-bell',
             'groups': 'fa-users',
             'cart': 'fa-shopping-cart',
             'support': 'fa-headset'
@@ -172,22 +171,18 @@ class Navigation {
 
     static updateNavigation() {
         const elements = {
-            // روابط الهيدر
-            'publish-link': currentUser,
-            'profile-link': currentUser,
+            'notifications-link': currentUser,
+            'footer-publish-link': currentUser,
+            'footer-profile-link': currentUser,
             'logout-link': currentUser,
             'login-link': !currentUser,
-            'register-link': !currentUser,
-            
-            // روابط الفوتر الجديدة
-            'footer-publish-link': currentUser,
-            'footer-profile-link': currentUser
+            'register-link': !currentUser
         };
 
         for (const [id, shouldShow] of Object.entries(elements)) {
             const element = document.getElementById(id);
             if (element) {
-                element.style.display = shouldShow ? (id.startsWith('footer') ? 'flex' : 'list-item') : 'none';
+                element.style.display = shouldShow ? 'flex' : 'none';
             }
         }
     }
@@ -202,4 +197,4 @@ class Navigation {
             </div>
         `;
     }
-                    }
+    }
