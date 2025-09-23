@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -23,6 +23,7 @@
                     <li id="login-link"><a href="#" onclick="Navigation.showPage('login')"><i class="fas fa-sign-in-alt"></i> <span class="nav-text">تسجيل الدخول</span></a></li>
                     <li id="register-link"><a href="#" onclick="Navigation.showPage('register')"><i class="fas fa-user-plus"></i> <span class="nav-text">إنشاء حساب</span></a></li>
                     <li id="logout-link" style="display: none;"><a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">تسجيل الخروج</span></a></li>
+                    <li><a href="#" onclick="Diagnostics.runFullDiagnosis()"><i class="fas fa-stethoscope"></i> <span class="nav-text">التشخيص</span></a></li>
                 </ul>
             </nav>
         </div>
@@ -61,28 +62,43 @@
     <!-- تحميل ملفات JavaScript بالترتيب الصحيح -->
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
-    <script src="js/navigation.js"></script>
+    
+    <!-- الكلاسات الأساسية -->
     <script src="js/auth.js"></script>
     <script src="js/posts.js"></script>
-    <script src="js/postDetails.js"></script>
+    <script src="js/postDetails.js"></script> <!-- تم التصحيح -->
+    <script src="js/home.js"></script>
+    
+    <!-- نظام التنقل (يجب أن يكون بعد الكلاسات) -->
+    <script src="js/navigation.js"></script>
+    
+    <!-- المعالجات -->
     <script src="js/eventHandlers.js"></script>
     <script src="js/formHandlers.js"></script>
-    <script src="js/home.js"></script>
+    
+    <!-- التشخيص والتطبيق الرئيسي -->
+    <script src="js/diagnostics.js"></script>
     <script src="js/app.js"></script>
-<script src="js/diagnostics.js"></script>
-    
-    </body>
+
+    <!-- تهيئة فورية للتحقق -->
+    <script>
+        console.log('🔍 التحقق من تحميل الكلاسات:');
+        console.log('- Auth:', typeof Auth);
+        console.log('- Posts:', typeof Posts);
+        console.log('- PostDetails:', typeof PostDetails);
+        console.log('- HomePage:', typeof HomePage);
+        console.log('- Navigation:', typeof Navigation);
+        console.log('- Utils:', typeof Utils);
+        
+        // التحقق من أن جميع الكلاسات محملة
+        window.addEventListener('load', function() {
+            if (typeof PostDetails === 'undefined') {
+                console.error('❌ PostDetails غير محمل! تحقق من الملف وترتيب التحميل.');
+            }
+            if (typeof Navigation === 'undefined') {
+                console.error('❌ Navigation غير محمل!');
+            }
+        });
+    </script>
+</body>
     </html>
-
-
-
-
-
-
-
-
-
-
-
-
-    
