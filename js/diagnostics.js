@@ -1,130 +1,95 @@
-// diagnostics.js - أداة تشخيص المشكلات
+// js/diagnostics.js - أداة تشخيص مبسطة
 class Diagnostics {
     static async runFullDiagnosis() {
-        console.log('🩺 بدء التشخيص الكامل للموقع...');
+        console.log('🩺 بدء التشخيص الفوري...');
         
         const results = {
-            config: await this.checkConfig(),
+            classes: this.checkClasses(),
             pages: await this.checkPages(),
             supabase: await this.checkSupabase(),
-            navigation: await this.checkNavigation(),
-            auth: await this.checkAuth()
+            user: this.checkUser()
         };
         
-        this.displayResults(results);
+        this.showResults(results);
+    }
+    
+    static checkClasses() {
+        const classes = ['Auth', 'Posts', 'PostDetails', 'HomePage', 'Navigation', 'Utils'];
+        const results = {};
+        
+        classes.forEach(className => {
+            results[className] = typeof window[className] !== 'undefined';
+        });
+        
         return results;
     }
     
-    static async checkConfig() {
-        console.log('🔧 التحقق من الإعدادات...');
-        const issues = [];
+    static async checkPages() {
+        const pages = Object.keys(CONFIG.PAGE_FILES);
+        const results = {};
         
-        if (!CONFIG) {
-            issues.push('CONFIG غير معرف');
-            return { ok: false, issues };
-        }
-        
-        if (!CONFIG.SUPABASE_URL) issues.push('SUPABASE_URL غير معرف');
-        if (!CONFIG.SUPABASE_KEY) issues.push('SUPABASE_KEY غير معرف');
-        if (!CONFIG.PAGE_FILES) issues.push('PAGE_FILES غير معرف');
-        
-        if (CONFIG.PAGE_FILES) {
-            const requiredPages = ['home', 'publish', 'login', 'register', 'profile'];
-            for (const page of requiredPages) {
-                if (!CONFIG.PAGE_FILES[page]) {
-                    issues.push(`الصفحة ${page} غير معرفة في PAGE_FILES`);
-                }
+        for (const page of pages) {
+            try {
+                const response = await fetch(CONFIG.PAGE_FILES[page], { method: 'HEAD' });
+                results[page] = response.ok;
+            } catch (error) {
+                results[page] = false;
             }
         }
         
-        return { 
-            ok: issues.length === 0, 
-            issues,
-            config: CONFIG 
-        };
-    }
-    
-    static async checkPages() {
-        console.log('📄 التحقق من وجود الملفات...');
-        return await Utils.checkAllPages();
+        return results;
     }
     
     static async checkSupabase() {
-        console.log('🔌 التحقق من اتصال Supabase...');
         try {
-            const { data, error } = await supabase.from('marketing').select('count').limit(1);
-            return { 
-                ok: !error, 
-                error: error ? error.message : null,
-                connected: !error
-            };
+            const { error } = await supabase.from('marketing').select('count').limit(1);
+            return { connected: !error, error: error ? error.message : null };
         } catch (error) {
-            return { ok: false, error: error.message, connected: false };
+            return { connected: false, error: error.message };
         }
     }
     
-    static async checkNavigation() {
-        console.log('🧭 التحقق من نظام التنقل...');
-        const issues = [];
-        
-        if (typeof Navigation === 'undefined') issues.push('Navigation غير معرف');
-        if (typeof Navigation.showPage !== 'function') issues.push('Navigation.showPage غير معرف');
-        if (typeof Utils.loadPageContent !== 'function') issues.push('Utils.loadPageContent غير معرف');
-        
-        return { ok: issues.length === 0, issues };
+    static checkUser() {
+        return { 
+            loggedIn: !!currentUser, 
+            email: currentUser ? currentUser.email : 'غير مسجل',
+            metadata: currentUser ? currentUser.user_metadata : null
+        };
     }
     
-    static async checkAuth() {
-        console.log('🔐 التحقق من نظام المصادقة...');
-        const issues = [];
+    static showResults(results) {
+        let html = '<div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">';
+        html += '<h3>🔍 تقرير التشخيص الفوري</h3>';
         
-        if (typeof Auth === 'undefined') issues.push('Auth غير معرف');
-        if (typeof currentUser === 'undefined') issues.push('currentUser غير معرف');
+        // الكلاسات
+        html += '<h4>📚 الكلاسات المحملة:</h4>';
+        Object.entries(results.classes).forEach(([className, loaded]) => {
+            html += `<p>${loaded ? '✅' : '❌'} ${className}: ${loaded ? 'محمول' : 'غير محمل'}</p>`;
+        });
         
-        return { ok: issues.length === 0, issues, currentUser };
-    }
-    
-    static displayResults(results) {
-        console.log('📊 نتائج التشخيص:', results);
+        // الصفحات
+        html += '<h4>📄 ملفات الصفحات:</h4>';
+        Object.entries(results.pages).forEach(([page, exists]) => {
+            html += `<p>${exists ? '✅' : '❌'} ${page}: ${exists ? 'موجود' : 'مفقود'}</p>`;
+        });
         
-        const diagnosticInfo = `
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                <h3>🔍 تقرير التشخيص</h3>
-                <p><strong>الإعدادات:</strong> ${results.config.ok ? '✅' : '❌'} ${results.config.issues.join(', ') || 'جيد'}</p>
-                <p><strong>Supabase:</strong> ${results.supabase.connected ? '✅ متصل' : '❌ غير متصل'}</p>
-                <p><strong>التنقل:</strong> ${results.navigation.ok ? '✅' : '❌'} ${results.navigation.issues.join(', ') || 'جيد'}</p>
-                <p><strong>المصادقة:</strong> ${results.auth.ok ? '✅' : '❌'} ${results.auth.issues.join(', ') || 'جيد'}</p>
-                <p><strong>المستخدم:</strong> ${results.auth.currentUser ? results.auth.currentUser.email : 'غير مسجل'}</p>
-                <button onclick="Diagnostics.runFullDiagnosis()" class="btn-secondary" style="margin-top: 10px;">
-                    <i class="fas fa-redo"></i> إعادة التشخيص
-                </button>
-            </div>
-        `;
+        // Supabase
+        html += `<h4>🔌 Supabase: ${results.supabase.connected ? '✅ متصل' : '❌ غير متصل'}</h4>`;
+        if (results.supabase.error) {
+            html += `<p><small>خطأ: ${results.supabase.error}</small></p>`;
+        }
         
-        // عرض النتائج في الصفحة إذا أمكن
+        // المستخدم
+        html += `<h4>👤 المستخدم: ${results.user.loggedIn ? '✅ مسجل' : '❌ غير مسجل'}</h4>`;
+        if (results.user.loggedIn) {
+            html += `<p><small>البريد: ${results.user.email}</small></p>`;
+        }
+        
+        html += '</div>';
+        
         const dynamicContent = document.getElementById('dynamic-content');
         if (dynamicContent) {
-            const existingDiagnostic = dynamicContent.querySelector('.diagnostic-results');
-            if (existingDiagnostic) {
-                existingDiagnostic.innerHTML = diagnosticInfo;
-            } else {
-                dynamicContent.insertAdjacentHTML('afterbegin', `<div class="diagnostic-results">${diagnosticInfo}</div>`);
-            }
+            dynamicContent.innerHTML = html + (dynamicContent.innerHTML || '');
         }
     }
-}
-
-// إضافة زر التشخيص إلى الهيدر
-document.addEventListener('DOMContentLoaded', function() {
-    const nav = document.querySelector('.nav-links');
-    if (nav) {
-        const diagnosticLi = document.createElement('li');
-        diagnosticLi.innerHTML = `
-            <a href="#" onclick="Diagnostics.runFullDiagnosis()">
-                <i class="fas fa-stethoscope"></i> 
-                <span class="nav-text">التشخيص</span>
-            </a>
-        `;
-        nav.appendChild(diagnosticLi);
     }
-});
