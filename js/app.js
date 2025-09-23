@@ -60,3 +60,13 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });
+
+
+
+
+// التحقق النهائي من التحميل
+console.log('=== التحقق النهائي من التحميل ===');
+console.log('PostDetails:', typeof PostDetails);
+console.log('Navigation:', typeof Navigation);
+console.log('Auth:', typeof Auth);
+console.log('=== انتهى التحقق ===');
