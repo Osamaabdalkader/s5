@@ -40,7 +40,7 @@ class Posts {
             if (error) throw error;
             
             // إعادة تحميل المنشورات
-            this.loadPosts();
+            HomePage.refreshPosts();
             return true;
         } catch (error) {
             console.error('Error publishing post:', error);
