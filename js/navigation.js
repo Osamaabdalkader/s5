@@ -1,120 +1,177 @@
-// navigation.js - معدل ومصحح
+// navigation.js - مصحح بالكامل
 class Navigation {
+    static currentPage = 'home';
+
     static async showPage(pageId, params = {}) {
-        console.log(`جاري تحميل الصفحة: ${pageId}`, params);
+        console.log(`=== جاري تحميل الصفحة: ${pageId}`, params);
         
         try {
+            // إخفاء الصفحة الحالية
+            const currentActive = document.querySelector('.page.active');
+            if (currentActive) {
+                currentActive.classList.remove('active');
+            }
+
             // إظهار رسالة تحميل
-            document.getElementById('dynamic-content').innerHTML = `
-                <div class="loading-page">
-                    <div class="loading-spinner"></div>
-                    <p>جاري تحميل الصفحة...</p>
-                </div>
-            `;
-            
+            const dynamicContent = document.getElementById('dynamic-content');
+            if (dynamicContent) {
+                dynamicContent.innerHTML = `
+                    <div class="loading-page">
+                        <div class="loading-spinner"></div>
+                        <p>جاري تحميل الصفحة...</p>
+                    </div>
+                `;
+            }
+
+            // تحميل محتوى الصفحة
             await Utils.loadPageContent(pageId);
+            
+            // تهيئة الصفحة بعد التحميل
             await this.initializePage(pageId, params);
-            console.log(`تم تحميل الصفحة بنجاح: ${pageId}`);
+            
+            this.currentPage = pageId;
+            console.log(`✅ تم تحميل الصفحة بنجاح: ${pageId}`);
+            
         } catch (error) {
-            console.error(`فشل في تحميل الصفحة: ${pageId}`, error);
+            console.error(`❌ فشل في تحميل الصفحة: ${pageId}`, error);
             this.showErrorPage(error, pageId);
         }
     }
 
     static async initializePage(pageId, params = {}) {
-        console.log(`جاري تهيئة الصفحة: ${pageId}`, params);
+        console.log(`🔄 جاري تهيئة الصفحة: ${pageId}`, params);
         
-        // إعطاء وقت للعناصر لتصبح جاهزة في DOM
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // الانتظار حتى يكون DOM جاهزاً
+        await new Promise(resolve => setTimeout(resolve, 150));
         
-        switch (pageId) {
-            case 'publish':
-                this.handlePublishPage();
-                break;
-            case 'login':
-                this.handleLoginPage();
-                break;
-            case 'register':
-                this.handleRegisterPage();
-                break;
-            case 'profile':
-                this.handleProfilePage();
-                break;
-            case 'home':
-                await HomePage.init();
-                break;
-            case 'post-details':
-                await this.handlePostDetailsPage(params);
-                break;
-            case 'notifications':
-            case 'groups':
-            case 'cart':
-            case 'support':
-                this.handleComingSoonPage(pageId);
-                break;
+        try {
+            switch (pageId) {
+                case 'publish':
+                    await this.handlePublishPage();
+                    break;
+                case 'login':
+                    await this.handleLoginPage();
+                    break;
+                case 'register':
+                    await this.handleRegisterPage();
+                    break;
+                case 'profile':
+                    await this.handleProfilePage();
+                    break;
+                case 'home':
+                    await this.handleHomePage();
+                    break;
+                case 'post-details':
+                    await this.handlePostDetailsPage(params);
+                    break;
+                case 'notifications':
+                case 'groups':
+                case 'cart':
+                case 'support':
+                    await this.handleComingSoonPage(pageId);
+                    break;
+                default:
+                    console.warn(`⚠️  الصفحة غير معروفة: ${pageId}`);
+            }
+            
+            console.log(`✅ تم تهيئة الصفحة: ${pageId}`);
+        } catch (error) {
+            console.error(`❌ خطأ في تهيئة الصفحة ${pageId}:`, error);
+            throw error;
         }
     }
 
-    static handlePublishPage() {
-        console.log('تهيئة صفحة النشر');
+    static async handlePublishPage() {
+        console.log('🔄 تهيئة صفحة النشر');
         const publishContent = document.getElementById('publish-content');
         const loginRequired = document.getElementById('login-required-publish');
         
-        if (publishContent && loginRequired) {
-            if (!currentUser) {
-                publishContent.style.display = 'none';
-                loginRequired.style.display = 'block';
-            } else {
-                publishContent.style.display = 'block';
-                loginRequired.style.display = 'none';
-            }
+        if (!publishContent || !loginRequired) {
+            throw new Error('عناصر صفحة النشر غير موجودة');
+        }
+        
+        if (!currentUser) {
+            publishContent.style.display = 'none';
+            loginRequired.style.display = 'block';
+        } else {
+            publishContent.style.display = 'block';
+            loginRequired.style.display = 'none';
         }
     }
 
-    static handleLoginPage() {
-        console.log('تهيئة صفحة تسجيل الدخول');
+    static async handleLoginPage() {
+        console.log('🔄 تهيئة صفحة تسجيل الدخول');
         const statusEl = document.getElementById('login-status');
         if (statusEl) {
             statusEl.style.display = 'none';
         }
+        
+        // التأكد من أن النموذج موجود
+        const loginForm = document.getElementById('login-form');
+        if (!loginForm) {
+            console.warn('نموذج تسجيل الدخول غير موجود');
+        }
     }
 
-    static handleRegisterPage() {
-        console.log('تهيئة صفحة التسجيل');
+    static async handleRegisterPage() {
+        console.log('🔄 تهيئة صفحة التسجيل');
         const statusEl = document.getElementById('register-status');
         if (statusEl) {
             statusEl.style.display = 'none';
         }
+        
+        const registerForm = document.getElementById('register-form');
+        if (!registerForm) {
+            console.warn('نموذج التسجيل غير موجود');
+        }
     }
 
-    static handleProfilePage() {
-        console.log('تهيئة صفحة الملف الشخصي');
+    static async handleProfilePage() {
+        console.log('🔄 تهيئة صفحة الملف الشخصي');
         const profileContent = document.getElementById('profile-content');
         const loginRequired = document.getElementById('login-required-profile');
         
-        if (profileContent && loginRequired) {
-            if (!currentUser) {
-                profileContent.style.display = 'none';
-                loginRequired.style.display = 'block';
-            } else {
-                profileContent.style.display = 'block';
-                loginRequired.style.display = 'none';
-                this.loadProfileData();
+        if (!profileContent || !loginRequired) {
+            throw new Error('عناصر صفحة الملف الشخصي غير موجودة');
+        }
+        
+        if (!currentUser) {
+            profileContent.style.display = 'none';
+            loginRequired.style.display = 'block';
+        } else {
+            profileContent.style.display = 'block';
+            loginRequired.style.display = 'none';
+            await this.loadProfileData();
+        }
+    }
+
+    static async handleHomePage() {
+        console.log('🔄 تهيئة الصفحة الرئيسية');
+        if (typeof HomePage !== 'undefined' && HomePage.init) {
+            await HomePage.init();
+        } else {
+            console.warn('HomePage غير معرف، جاري تحميل المنشورات مباشرة');
+            if (typeof Posts !== 'undefined' && Posts.loadPosts) {
+                await Posts.loadPosts();
             }
         }
     }
 
     static async handlePostDetailsPage(params) {
-        console.log('تهيئة صفحة تفاصيل المنشور', params);
-        if (params && params.postId) {
+        console.log('🔄 تهيئة صفحة تفاصيل المنشور', params);
+        if (!params || !params.postId) {
+            throw new Error('معرف المنشور غير موجود');
+        }
+        
+        if (typeof PostDetails !== 'undefined' && PostDetails.loadPostDetails) {
             await PostDetails.loadPostDetails(params.postId);
         } else {
-            PostDetails.showError();
+            throw new Error('PostDetails غير معرف');
         }
     }
 
-    static handleComingSoonPage(pageId) {
-        console.log('تهيئة صفحة قيد التطوير:', pageId);
+    static async handleComingSoonPage(pageId) {
+        console.log('🔄 تهيئة صفحة قيد التطوير:', pageId);
         const pageTitles = {
             'notifications': 'الإشعارات',
             'groups': 'مجموعتي',
@@ -126,13 +183,13 @@ class Navigation {
         if (contentEl) {
             contentEl.innerHTML = `
                 <section id="${pageId}-page" class="page active">
-                    <h1 class="section-title">${pageTitles[pageId]}</h1>
+                    <h1 class="section-title">${pageTitles[pageId] || pageId}</h1>
                     <div class="coming-soon">
                         <i class="fas ${this.getPageIcon(pageId)} fa-3x"></i>
                         <h2>قريباً</h2>
                         <p>هذه الصفحة قيد التطوير</p>
                         <button onclick="Navigation.showPage('home')" class="btn-secondary">
-                            <i class="fas fa-arrow-right"></i> العودة إلى الرئيسية
+                            <i class="fas fa-home"></i> العودة إلى الرئيسية
                         </button>
                     </div>
                 </section>
@@ -145,14 +202,18 @@ class Navigation {
             'notifications': 'fa-bell',
             'groups': 'fa-users',
             'cart': 'fa-shopping-cart',
-            'support': 'fa-headset'
+            'support': 'fa-headset',
+            'publish': 'fa-plus-circle',
+            'profile': 'fa-user',
+            'login': 'fa-sign-in-alt',
+            'register': 'fa-user-plus'
         };
         return icons[pageId] || 'fa-cogs';
     }
 
-    static loadProfileData() {
+    static async loadProfileData() {
         if (currentUser) {
-            console.log('تحميل بيانات الملف الشخصي:', currentUser);
+            console.log('📊 تحميل بيانات الملف الشخصي:', currentUser);
             const setName = (id, value) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = value || 'غير محدد';
@@ -170,17 +231,21 @@ class Navigation {
     }
 
     static updateNavigation() {
-        console.log('تحديث التنقل، المستخدم الحالي:', currentUser);
-        const elements = {
+        console.log('🔗 تحديث التنقل، المستخدم الحالي:', currentUser ? currentUser.email : 'غير مسجل');
+        
+        const navElements = {
+            // عناصر الهيدر
             'notifications-link': currentUser,
-            'footer-publish-link': currentUser,
-            'footer-profile-link': currentUser,
             'logout-link': currentUser,
             'login-link': !currentUser,
-            'register-link': !currentUser
+            'register-link': !currentUser,
+            
+            // عناصر الفوتر
+            'footer-profile-link': currentUser,
+            'footer-publish-link': currentUser
         };
 
-        for (const [id, shouldShow] of Object.entries(elements)) {
+        for (const [id, shouldShow] of Object.entries(navElements)) {
             const element = document.getElementById(id);
             if (element) {
                 element.style.display = shouldShow ? 'flex' : 'none';
@@ -189,16 +254,36 @@ class Navigation {
     }
 
     static showErrorPage(error, pageId) {
-        console.error('عرض صفحة الخطأ:', error);
-        document.getElementById('dynamic-content').innerHTML = `
-            <div class="error-page">
-                <h1 class="section-title">خطأ في تحميل الصفحة</h1>
-                <p>تعذر تحميل الصفحة المطلوبة: ${pageId}</p>
-                <p>الخطأ: ${error.message}</p>
-                <button onclick="Navigation.showPage('home')" class="btn-secondary">
-                    <i class="fas fa-arrow-right"></i> العودة إلى الرئيسية
-                </button>
-            </div>
-        `;
+        console.error('💥 عرض صفحة الخطأ:', error);
+        const dynamicContent = document.getElementById('dynamic-content');
+        if (dynamicContent) {
+            dynamicContent.innerHTML = `
+                <div class="error-page">
+                    <h1 class="section-title">خطأ في تحميل الصفحة</h1>
+                    <p>تعذر تحميل الصفحة المطلوبة: <strong>${pageId}</strong></p>
+                    <p><strong>الخطأ:</strong> ${error.message}</p>
+                    <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                        <small>تفاصيل تقنية: ${error.stack || 'لا توجد تفاصيل إضافية'}</small>
+                    </div>
+                    <button onclick="Navigation.showPage('home')" class="btn-secondary" style="margin-top: 20px;">
+                        <i class="fas fa-home"></i> العودة إلى الرئيسية
+                    </button>
+                </div>
+            `;
+        }
     }
-}
+
+    // دالة مساعدة للتحقق من وجود الصفحة
+    static async checkPageExists(pageId) {
+        if (!CONFIG.PAGE_FILES[pageId]) {
+            return false;
+        }
+        
+        try {
+            const response = await fetch(CONFIG.PAGE_FILES[pageId]);
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+                        }
