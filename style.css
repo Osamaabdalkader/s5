@@ -1,3 +1,99 @@
+/* إضافة الأنماط الجديدة للهيدر والفوتر */
+
+/* الهيدر في الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .nav-text {
+        display: none;
+    }
+    
+    .logo-text {
+        display: none;
+    }
+    
+    .nav-links a {
+        flex-direction: column;
+        font-size: 0.8rem;
+    }
+    
+    .nav-links i {
+        margin-left: 0;
+        margin-bottom: 5px;
+        font-size: 1.2rem;
+    }
+    
+    .logo i {
+        margin-left: 0;
+        font-size: 1.5rem;
+    }
+}
+
+/* الفوتر الجديد */
+.footer-nav {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.footer-nav-section a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.3s;
+    padding: 8px 15px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.footer-nav-section a:hover {
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.footer-nav-section a i {
+    margin-left: 10px;
+    font-size: 1.2rem;
+}
+
+.footer-nav-section a span {
+    font-size: 0.9rem;
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 480px) {
+    .footer-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .footer-nav-section {
+        flex-direction: row;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .footer-nav-section a {
+        flex-direction: column;
+        text-align: center;
+        min-width: 80px;
+    }
+    
+    .footer-nav-section a i {
+        margin-left: 0;
+        margin-bottom: 5px;
+    }
+}
+
+    
+
 .loading {
     text-align: center;
     padding: 50px;
@@ -365,6 +461,27 @@ nav {
         padding: 20px;
     }
 }
+
+
+
+.coming-soon {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin: 20px 0;
+}
+
+.coming-soon i {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+}
+
+.coming-soon h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+} 
 
 
 
