@@ -46,6 +46,11 @@ class Navigation {
             case 'post-details':
                 this.handlePostDetailsPage(params);
                 break;
+            case 'groups':
+            case 'cart':
+            case 'support':
+                this.handleComingSoonPage(pageId);
+                break;
         }
         
         // إعادة ربط الأحداث بعد تهيئة الصفحة
@@ -115,6 +120,41 @@ class Navigation {
         }
     }
 
+    static handleComingSoonPage(pageId) {
+        // الصفحات التي قيد التطوير
+        const pageTitles = {
+            'groups': 'مجموعتي',
+            'cart': 'سلة التسوق',
+            'support': 'الدعم الفني'
+        };
+        
+        const contentEl = document.getElementById('dynamic-content');
+        if (contentEl) {
+            contentEl.innerHTML = `
+                <section id="${pageId}-page" class="page active">
+                    <h1 class="section-title">${pageTitles[pageId]}</h1>
+                    <div class="coming-soon">
+                        <i class="fas ${this.getPageIcon(pageId)} fa-3x"></i>
+                        <h2>قريباً</h2>
+                        <p>هذه الصفحة قيد التطوير</p>
+                        <button onclick="Navigation.showPage('home')" class="btn-secondary">
+                            <i class="fas fa-arrow-right"></i> العودة إلى الرئيسية
+                        </button>
+                    </div>
+                </section>
+            `;
+        }
+    }
+
+    static getPageIcon(pageId) {
+        const icons = {
+            'groups': 'fa-users',
+            'cart': 'fa-shopping-cart',
+            'support': 'fa-headset'
+        };
+        return icons[pageId] || 'fa-cogs';
+    }
+
     static loadProfileData() {
         if (currentUser) {
             const setName = (id, value) => {
@@ -132,17 +172,22 @@ class Navigation {
 
     static updateNavigation() {
         const elements = {
+            // روابط الهيدر
             'publish-link': currentUser,
             'profile-link': currentUser,
             'logout-link': currentUser,
             'login-link': !currentUser,
-            'register-link': !currentUser
+            'register-link': !currentUser,
+            
+            // روابط الفوتر الجديدة
+            'footer-publish-link': currentUser,
+            'footer-profile-link': currentUser
         };
 
         for (const [id, shouldShow] of Object.entries(elements)) {
             const element = document.getElementById(id);
             if (element) {
-                element.style.display = shouldShow ? 'list-item' : 'none';
+                element.style.display = shouldShow ? (id.startsWith('footer') ? 'flex' : 'list-item') : 'none';
             }
         }
     }
@@ -157,4 +202,4 @@ class Navigation {
             </div>
         `;
     }
-}
+                    }
