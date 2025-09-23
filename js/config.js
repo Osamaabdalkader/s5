@@ -9,7 +9,10 @@ const CONFIG = {
         'login': 'login.html',
         'register': 'register.html',
         'profile': 'profile.html',
-        'post-details': 'post-details.html' // تم الإضافة
+        'post-details': 'post-details.html',
+        'groups': 'groups.html',
+        'cart': 'cart.html',
+        'support': 'support.html'
     },
     
     MAX_IMAGE_SIZE: 5 * 1024 * 1024, // 5MB
