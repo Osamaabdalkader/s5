@@ -1,21 +1,17 @@
-// navigation.js - معدل
+// navigation.js - معدل ومصحح
 class Navigation {
     static async showPage(pageId, params = {}) {
         console.log(`جاري تحميل الصفحة: ${pageId}`, params);
         
-        // إخفاء جميع الصفحات أولاً
-        const pages = document.querySelectorAll('.page');
-        pages.forEach(page => page.classList.remove('active'));
-        
-        // إظهار رسالة تحميل
-        document.getElementById('dynamic-content').innerHTML = `
-            <div class="loading-page">
-                <div class="loading-spinner"></div>
-                <p>جاري تحميل الصفحة...</p>
-            </div>
-        `;
-        
         try {
+            // إظهار رسالة تحميل
+            document.getElementById('dynamic-content').innerHTML = `
+                <div class="loading-page">
+                    <div class="loading-spinner"></div>
+                    <p>جاري تحميل الصفحة...</p>
+                </div>
+            `;
+            
             await Utils.loadPageContent(pageId);
             await this.initializePage(pageId, params);
             console.log(`تم تحميل الصفحة بنجاح: ${pageId}`);
@@ -45,10 +41,10 @@ class Navigation {
                 this.handleProfilePage();
                 break;
             case 'home':
-                await HomePage.init(); // استخدام HomePage بدلاً من Posts
+                await HomePage.init();
                 break;
             case 'post-details':
-                this.handlePostDetailsPage(params);
+                await this.handlePostDetailsPage(params);
                 break;
             case 'notifications':
             case 'groups':
@@ -57,15 +53,10 @@ class Navigation {
                 this.handleComingSoonPage(pageId);
                 break;
         }
-        
-        this.rebindPageEvents(pageId);
-    }
-
-    static rebindPageEvents(pageId) {
-        console.log(`إعادة ربط أحداث الصفحة: ${pageId}`);
     }
 
     static handlePublishPage() {
+        console.log('تهيئة صفحة النشر');
         const publishContent = document.getElementById('publish-content');
         const loginRequired = document.getElementById('login-required-publish');
         
@@ -81,6 +72,7 @@ class Navigation {
     }
 
     static handleLoginPage() {
+        console.log('تهيئة صفحة تسجيل الدخول');
         const statusEl = document.getElementById('login-status');
         if (statusEl) {
             statusEl.style.display = 'none';
@@ -88,6 +80,7 @@ class Navigation {
     }
 
     static handleRegisterPage() {
+        console.log('تهيئة صفحة التسجيل');
         const statusEl = document.getElementById('register-status');
         if (statusEl) {
             statusEl.style.display = 'none';
@@ -95,6 +88,7 @@ class Navigation {
     }
 
     static handleProfilePage() {
+        console.log('تهيئة صفحة الملف الشخصي');
         const profileContent = document.getElementById('profile-content');
         const loginRequired = document.getElementById('login-required-profile');
         
@@ -110,15 +104,17 @@ class Navigation {
         }
     }
 
-    static handlePostDetailsPage(params) {
-        if (params.postId) {
-            PostDetails.loadPostDetails(params.postId);
+    static async handlePostDetailsPage(params) {
+        console.log('تهيئة صفحة تفاصيل المنشور', params);
+        if (params && params.postId) {
+            await PostDetails.loadPostDetails(params.postId);
         } else {
             PostDetails.showError();
         }
     }
 
     static handleComingSoonPage(pageId) {
+        console.log('تهيئة صفحة قيد التطوير:', pageId);
         const pageTitles = {
             'notifications': 'الإشعارات',
             'groups': 'مجموعتي',
@@ -156,20 +152,25 @@ class Navigation {
 
     static loadProfileData() {
         if (currentUser) {
+            console.log('تحميل بيانات الملف الشخصي:', currentUser);
             const setName = (id, value) => {
                 const el = document.getElementById(id);
-                if (el) el.textContent = value;
+                if (el) el.textContent = value || 'غير محدد';
             };
             
-            setName('profile-name', currentUser.user_metadata.full_name || 'غير محدد');
-            setName('profile-email', currentUser.email || 'غير محدد');
-            setName('profile-phone', currentUser.user_metadata.phone || 'غير محدد');
-            setName('profile-address', currentUser.user_metadata.address || 'غير محدد');
-            setName('profile-created', new Date(currentUser.created_at).toLocaleString('ar-SA'));
+            setName('profile-name', currentUser.user_metadata?.full_name);
+            setName('profile-email', currentUser.email);
+            setName('profile-phone', currentUser.user_metadata?.phone);
+            setName('profile-address', currentUser.user_metadata?.address);
+            
+            if (currentUser.created_at) {
+                setName('profile-created', new Date(currentUser.created_at).toLocaleString('ar-SA'));
+            }
         }
     }
 
     static updateNavigation() {
+        console.log('تحديث التنقل، المستخدم الحالي:', currentUser);
         const elements = {
             'notifications-link': currentUser,
             'footer-publish-link': currentUser,
@@ -188,13 +189,16 @@ class Navigation {
     }
 
     static showErrorPage(error, pageId) {
+        console.error('عرض صفحة الخطأ:', error);
         document.getElementById('dynamic-content').innerHTML = `
             <div class="error-page">
                 <h1 class="section-title">خطأ في تحميل الصفحة</h1>
                 <p>تعذر تحميل الصفحة المطلوبة: ${pageId}</p>
                 <p>الخطأ: ${error.message}</p>
-                <button onclick="Navigation.showPage('home')">العودة إلى الرئيسية</button>
+                <button onclick="Navigation.showPage('home')" class="btn-secondary">
+                    <i class="fas fa-arrow-right"></i> العودة إلى الرئيسية
+                </button>
             </div>
         `;
     }
-    }
+}

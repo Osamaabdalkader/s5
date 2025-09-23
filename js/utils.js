@@ -1,4 +1,4 @@
-// utils.js
+// utils.js - معدل ومصحح
 class Utils {
     // تحميل محتوى الصفحة من ملف منفصل
     static async loadPageContent(pageId) {
@@ -10,21 +10,33 @@ class Utils {
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            const url = CONFIG.PAGE_FILES[pageId] + '?v=' + Date.now();
+            const fileName = CONFIG.PAGE_FILES[pageId];
+            const url = fileName + '?v=' + Date.now();
+            
+            console.log(`جاري تحميل الملف: ${url}`);
             
             xhr.open('GET', url, true);
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        document.getElementById('dynamic-content').innerHTML = xhr.responseText;
-                        resolve(true);
+                        const dynamicContent = document.getElementById('dynamic-content');
+                        if (dynamicContent) {
+                            dynamicContent.innerHTML = xhr.responseText;
+                            console.log(`تم تحميل الصفحة بنجاح: ${pageId}`);
+                            resolve(true);
+                        } else {
+                            reject(new Error('عنصر dynamic-content غير موجود'));
+                        }
                     } else {
-                        reject(new Error(`فشل في تحميل الصفحة: ${xhr.status}`));
+                        reject(new Error(`فشل في تحميل الصفحة: ${xhr.status} - ${fileName}`));
                     }
                 }
             };
             
-            xhr.onerror = () => reject(new Error('خطأ في الشبكة'));
+            xhr.onerror = () => {
+                reject(new Error(`خطأ في الشبكة أثناء تحميل: ${fileName}`));
+            };
+            
             xhr.send();
         });
     }
@@ -42,11 +54,14 @@ class Utils {
                     statusEl.style.display = 'none';
                 }, CONFIG.SUCCESS_MESSAGE_DURATION);
             }
+        } else {
+            console.warn(`عنصر الرسالة غير موجود: ${elementId}`);
         }
     }
 
     // تنسيق الأرقام (الأسعار)
     static formatPrice(price) {
+        if (!price) return "0 ريال يمني";
         return new Intl.NumberFormat('ar-YE').format(price) + " ريال يمني";
     }
 

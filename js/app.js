@@ -1,22 +1,31 @@
-// js/app.js - الكود الرئيسي (مختصر بعد التجزئة)
+// js/app.js - الكود الرئيسي (معدل ومصحح)
 class App {
     static async init() {
         console.log('تهيئة التطبيق...');
         
-        await this.testConnection();
-        await Auth.checkAuth();
-        Auth.initAuthListener();
-        Navigation.showPage('home');
-        
-        // إعداد معالجة الأحداث العالمية
-        this.setupGlobalEventHandlers();
-        
-        console.log('تم تهيئة التطبيق بنجاح');
+        try {
+            await this.testConnection();
+            await Auth.checkAuth();
+            Auth.initAuthListener();
+            
+            // إعداد معالجة الأحداث العالمية
+            this.setupGlobalEventHandlers();
+            
+            // تحميل الصفحة الرئيسية بعد التأكد من أن كل شيء جاهز
+            setTimeout(() => {
+                Navigation.showPage('home');
+            }, 100);
+            
+            console.log('تم تهيئة التطبيق بنجاح');
+        } catch (error) {
+            console.error('خطأ في تهيئة التطبيق:', error);
+            Utils.showStatus(`خطأ في التهيئة: ${error.message}`, 'error', 'connection-status');
+        }
     }
 
     static async testConnection() {
         try {
-            const { data, error } = await supabase.from('marketing').select('count');
+            const { data, error } = await supabase.from('marketing').select('count').limit(1);
             if (error) throw error;
             Utils.showStatus('الاتصال مع قاعدة البيانات ناجح', 'success', 'connection-status');
         } catch (error) {

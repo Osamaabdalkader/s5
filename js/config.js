@@ -1,4 +1,4 @@
-// config.js
+// config.js - معدل ومصحح
 const CONFIG = {
     SUPABASE_URL: 'https://rrjocpzsyxefcsztazkd.supabase.co',
     SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJyam9jcHpzeXhlZmNzenRhemtkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgyOTEzMTgsImV4cCI6MjA3Mzg2NzMxOH0.TvUthkBc_lnDdGlHJdEFUPo4Dl2n2oHyokXZE8_wodw',
@@ -9,7 +9,7 @@ const CONFIG = {
         'login': 'login.html',
         'register': 'register.html',
         'profile': 'profile.html',
-        'post-details': 'post-details.html',
+        'post-details': 'post-detail.html',
         'notifications': 'notifications.html',
         'groups': 'groups.html',
         'cart': 'cart.html',
