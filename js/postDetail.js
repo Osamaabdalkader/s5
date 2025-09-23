@@ -1,10 +1,12 @@
-// js/postDetails.js - إدارة صفحة تفاصيل المنشور
+// js/postDetails.js - إصلاح كامل
 class PostDetails {
     static currentPostId = null;
 
     static async loadPostDetails(postId) {
         try {
+            console.log('🔍 جاري تحميل تفاصيل المنشور:', postId);
             this.currentPostId = postId;
+            
             const { data: post, error } = await supabase
                 .from('marketing')
                 .select('*')
@@ -15,16 +17,20 @@ class PostDetails {
             
             this.displayPostDetails(post);
         } catch (error) {
-            console.error('Error loading post details:', error);
+            console.error('❌ خطأ في تحميل تفاصيل المنشور:', error);
             this.showError();
         }
     }
 
     static displayPostDetails(post) {
+        console.log('📄 عرض تفاصيل المنشور:', post);
         const contentEl = document.getElementById('post-details-content');
         const errorEl = document.getElementById('post-details-error');
         
-        if (!contentEl) return;
+        if (!contentEl) {
+            console.error('❌ عنصر تفاصيل المنشور غير موجود');
+            return;
+        }
 
         errorEl.style.display = 'none';
         contentEl.style.display = 'block';
@@ -38,7 +44,7 @@ class PostDetails {
 
         contentEl.innerHTML = `
             <div class="post-detail-header">
-                <h2 class="post-detail-title">${post.name}</h2>
+                <h2 class="post-detail-title">${post.name || 'بدون عنوان'}</h2>
                 <span class="post-detail-price">${Utils.formatPrice(post.price)}</span>
             </div>
             
@@ -46,19 +52,19 @@ class PostDetails {
             
             <div class="post-detail-description">
                 <h3><i class="fas fa-align-left"></i> الوصف:</h3>
-                <p>${post.description}</p>
+                <p>${post.description || 'لا يوجد وصف'}</p>
             </div>
             
             <div class="post-detail-info">
                 <div class="detail-item">
                     <i class="fas fa-tag"></i>
                     <strong>النوع:</strong>
-                    <span>${post.category}</span>
+                    <span>${post.category || 'غير محدد'}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <strong>الموقع:</strong>
-                    <span>${post.location}</span>
+                    <span>${post.location || 'غير محدد'}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-user"></i>
@@ -68,7 +74,7 @@ class PostDetails {
                 <div class="detail-item">
                     <i class="fas fa-calendar"></i>
                     <strong>تاريخ النشر:</strong>
-                    <span>${new Date(post.created_at).toLocaleString('ar-SA')}</span>
+                    <span>${post.created_at ? new Date(post.created_at).toLocaleString('ar-SA') : 'غير معروف'}</span>
                 </div>
             </div>
             
@@ -90,6 +96,7 @@ class PostDetails {
     }
 
     static showError() {
+        console.error('❌ عرض خطأ تفاصيل المنشور');
         const contentEl = document.getElementById('post-details-content');
         const errorEl = document.getElementById('post-details-error');
         
@@ -106,17 +113,18 @@ class PostDetails {
             return;
         }
 
-        // هنا يمكنك إضافة منطق الطلب (إرسال إيميل، رسالة، إلخ)
         const message = `طلب على المنتج: ${post.name}\nالسعر: ${Utils.formatPrice(post.price)}\nصاحب المنشور: ${post.user_id}`;
         
         Utils.showStatus('تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً', 'success');
         console.log('تفاصيل الطلب:', message);
-        
-        // يمكنك إضافة API لإرسال الإشعارات هنا
     }
 
     static initPage() {
-        // هذه الدالة تستدعى عند تحميل الصفحة
-        console.log('تهيئة صفحة تفاصيل المنشور');
+        console.log('✅ تهيئة صفحة تفاصيل المنشور');
     }
 }
+
+// التأكد من أن الكلاس معرف عالمياً
+if (typeof window !== 'undefined') {
+    window.PostDetails = PostDetails;
+        }
