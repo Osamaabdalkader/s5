@@ -15,15 +15,14 @@
             <nav>
                 <div class="logo">
                     <i class="fas fa-bolt"></i>
-                    <span class="logo-text">منصة تسريع الإلكترونية</span>
+                    منصة تسريع الإلكترونية
                 </div>
                 <ul class="nav-links">
                     <li><a href="#" onclick="Navigation.showPage('home')"><i class="fas fa-home"></i> <span class="nav-text">الرئيسية</span></a></li>
-                    <li id="notifications-link" style="display: none;"><a href="#" onclick="Navigation.showPage('notifications')"><i class="fas fa-bell"></i> <span class="nav-text">الإشعارات</span></a></li>
                     <li id="login-link"><a href="#" onclick="Navigation.showPage('login')"><i class="fas fa-sign-in-alt"></i> <span class="nav-text">تسجيل الدخول</span></a></li>
                     <li id="register-link"><a href="#" onclick="Navigation.showPage('register')"><i class="fas fa-user-plus"></i> <span class="nav-text">إنشاء حساب</span></a></li>
                     <li id="logout-link" style="display: none;"><a href="#" onclick="Auth.logout()"><i class="fas fa-sign-out-alt"></i> <span class="nav-text">تسجيل الخروج</span></a></li>
-                    <li><a href="#" onclick="Diagnostics.runFullDiagnosis()"><i class="fas fa-stethoscope"></i> <span class="nav-text">التشخيص</span></a></li>
+                    <li><a href="#" onclick="App.toggleDebug()"><i class="fas fa-bug"></i> <span class="nav-text">تصحيح الأخطاء</span></a></li>
                 </ul>
             </nav>
         </div>
@@ -35,61 +34,44 @@
     </main>
 
     <footer>
-        <div class="footer-nav">
-            <a id="footer-profile-link" style="display: none;" href="#" onclick="Navigation.showPage('profile')">
-                <i class="fas fa-user"></i>
-                <span class="footer-nav-text">حسابي</span>
-            </a>
-            <a href="#" onclick="Navigation.showPage('groups')">
-                <i class="fas fa-users"></i>
-                <span class="footer-nav-text">مجموعتي</span>
-            </a>
-            <a id="footer-publish-link" style="display: none;" href="#" onclick="Navigation.showPage('publish')">
-                <i class="fas fa-plus-circle"></i>
-                <span class="footer-nav-text">إضافة</span>
-            </a>
-            <a href="#" onclick="Navigation.showPage('cart')">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="footer-nav-text">السلة</span>
-            </a>
-            <a href="#" onclick="Navigation.showPage('support')">
-                <i class="fas fa-headset"></i>
-                <span class="footer-nav-text">الدعم</span>
-            </a>
+        <div class="container">
+            <div class="footer-icons">
+                <a href="#" onclick="Navigation.showPage('profile')" id="footer-profile-link" style="display: none;">
+                    <i class="fas fa-user"></i>
+                    <span>حسابي</span>
+                </a>
+                <a href="javascript:void(0)" onclick="alert('هذه الصفحة قيد التطوير')">
+                    <i class="fas fa-users"></i>
+                    <span>مجموعتي</span>
+                </a>
+                <a href="#" onclick="Navigation.showPage('publish')" id="footer-publish-link" style="display: none;">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>نشر</span>
+                </a>
+                <a href="javascript:void(0)" onclick="alert('هذه الصفحة قيد التطوير')">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>السلة</span>
+                </a>
+                <a href="javascript:void(0)" onclick="alert('هذه الصفحة قيد التطوير')">
+                    <i class="fas fa-headset"></i>
+                    <span>الدعم</span>
+                </a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2023 منصة تسريع الإلكترونية. جميع الحقوق محفوظة.</p>
+            </div>
         </div>
     </footer>
 
     <!-- تحميل ملفات JavaScript بالترتيب الصحيح -->
-    <!-- الترتيب الصحيح بناءً على الملفات الأصلية -->
-<script src="js/config.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/navigation.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/posts.js"></script>
-<script src="js/postDetail.js"></script> <!-- بدون s -->
-<!-- إزالة home.js مؤقتاً للاختبار -->
-<script src="js/eventHandlers.js"></script>
-<script src="js/formHandlers.js"></script>
-<script src="js/app.js"></script>
-    <!-- تهيئة فورية للتحقق -->
-    <script>
-        console.log('🔍 التحقق من تحميل الكلاسات:');
-        console.log('- Auth:', typeof Auth);
-        console.log('- Posts:', typeof Posts);
-        console.log('- PostDetails:', typeof PostDetails);
-        console.log('- HomePage:', typeof HomePage);
-        console.log('- Navigation:', typeof Navigation);
-        console.log('- Utils:', typeof Utils);
-        
-        // التحقق من أن جميع الكلاسات محملة
-        window.addEventListener('load', function() {
-            if (typeof PostDetails === 'undefined') {
-                console.error('❌ PostDetails غير محمل! تحقق من الملف وترتيب التحميل.');
-            }
-            if (typeof Navigation === 'undefined') {
-                console.error('❌ Navigation غير محمل!');
-            }
-        });
-    </script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/posts.js"></script>
+    <script src="js/postDetails.js"></script>
+    <script src="js/eventHandlers.js"></script>
+    <script src="js/formHandlers.js"></script>
+    <script src="js/app.js"></script>
 </body>
-    </html>
+</html>
