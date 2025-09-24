@@ -1,12 +1,7 @@
-// js/postDetails.js - إصلاح كامل
+// postDetail.js - التأكد من أنه مطابق للإصدار القديم
 class PostDetails {
-    static currentPostId = null;
-
     static async loadPostDetails(postId) {
         try {
-            console.log('🔍 جاري تحميل تفاصيل المنشور:', postId);
-            this.currentPostId = postId;
-            
             const { data: post, error } = await supabase
                 .from('marketing')
                 .select('*')
@@ -17,24 +12,43 @@ class PostDetails {
             
             this.displayPostDetails(post);
         } catch (error) {
-            console.error('❌ خطأ في تحميل تفاصيل المنشور:', error);
+            console.error('Error loading post details:', error);
             this.showError();
         }
     }
 
     static displayPostDetails(post) {
-        console.log('📄 عرض تفاصيل المنشور:', post);
         const contentEl = document.getElementById('post-details-content');
+        if (!contentEl) return;
+
+        const imageHtml = post.image_url 
+            ? `<img src="${post.image_url}" alt="${post.name}" class="post-detail-image">`
+            : `<div class="post-detail-image no-image">لا توجد صورة</div>`;
+
+        contentEl.innerHTML = `
+            <div class="post-detail-header">
+                <h2>${post.name}</h2>
+                <span class="post-detail-price">${Utils.formatPrice(post.price)}</span>
+            </div>
+            ${imageHtml}
+            <div class="post-detail-description">
+                <p>${post.description}</p>
+            </div>
+            <div class="post-detail-info">
+                <div><strong>النوع:</strong> ${post.category}</div>
+                <div><strong>الموقع:</strong> ${post.location}</div>
+                <div><strong>الناشر:</strong> ${post.user_id}</div>
+            </div>
+        `;
+    }
+
+    static showError() {
         const errorEl = document.getElementById('post-details-error');
-        
-        if (!contentEl) {
-            console.error('❌ عنصر تفاصيل المنشور غير موجود');
-            return;
+        if (errorEl) {
+            errorEl.style.display = 'block';
         }
-
-        errorEl.style.display = 'none';
-        contentEl.style.display = 'block';
-
+    }
+    }
         const imageHtml = post.image_url 
             ? `<img src="${post.image_url}" alt="${post.name}" class="post-detail-image">`
             : `<div class="post-detail-image no-image">
