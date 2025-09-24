@@ -1,31 +1,22 @@
-// js/app.js - الكود الرئيسي (معدل ومصحح)
+// js/app.js - الكود الرئيسي (مختصر بعد التجزئة)
 class App {
     static async init() {
         console.log('تهيئة التطبيق...');
         
-        try {
-            await this.testConnection();
-            await Auth.checkAuth();
-            Auth.initAuthListener();
-            
-            // إعداد معالجة الأحداث العالمية
-            this.setupGlobalEventHandlers();
-            
-            // تحميل الصفحة الرئيسية بعد التأكد من أن كل شيء جاهز
-            setTimeout(() => {
-                Navigation.showPage('home');
-            }, 100);
-            
-            console.log('تم تهيئة التطبيق بنجاح');
-        } catch (error) {
-            console.error('خطأ في تهيئة التطبيق:', error);
-            Utils.showStatus(`خطأ في التهيئة: ${error.message}`, 'error', 'connection-status');
-        }
+        await this.testConnection();
+        await Auth.checkAuth();
+        Auth.initAuthListener();
+        Navigation.showPage('home');
+        
+        // إعداد معالجة الأحداث العالمية
+        this.setupGlobalEventHandlers();
+        
+        console.log('تم تهيئة التطبيق بنجاح');
     }
 
     static async testConnection() {
         try {
-            const { data, error } = await supabase.from('marketing').select('count').limit(1);
+            const { data, error } = await supabase.from('marketing').select('count');
             if (error) throw error;
             Utils.showStatus('الاتصال مع قاعدة البيانات ناجح', 'success', 'connection-status');
         } catch (error) {
@@ -60,13 +51,3 @@ class App {
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });
-
-
-
-
-// التحقق النهائي من التحميل
-console.log('=== التحقق النهائي من التحميل ===');
-console.log('PostDetails:', typeof PostDetails);
-console.log('Navigation:', typeof Navigation);
-console.log('Auth:', typeof Auth);
-console.log('=== انتهى التحقق ===');

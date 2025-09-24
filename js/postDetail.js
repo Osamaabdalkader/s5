@@ -1,7 +1,10 @@
-// postDetail.js - التأكد من أنه مطابق للإصدار القديم
+// js/postDetails.js - إدارة صفحة تفاصيل المنشور
 class PostDetails {
+    static currentPostId = null;
+
     static async loadPostDetails(postId) {
         try {
+            this.currentPostId = postId;
             const { data: post, error } = await supabase
                 .from('marketing')
                 .select('*')
@@ -19,36 +22,13 @@ class PostDetails {
 
     static displayPostDetails(post) {
         const contentEl = document.getElementById('post-details-content');
+        const errorEl = document.getElementById('post-details-error');
+        
         if (!contentEl) return;
 
-        const imageHtml = post.image_url 
-            ? `<img src="${post.image_url}" alt="${post.name}" class="post-detail-image">`
-            : `<div class="post-detail-image no-image">لا توجد صورة</div>`;
+        errorEl.style.display = 'none';
+        contentEl.style.display = 'block';
 
-        contentEl.innerHTML = `
-            <div class="post-detail-header">
-                <h2>${post.name}</h2>
-                <span class="post-detail-price">${Utils.formatPrice(post.price)}</span>
-            </div>
-            ${imageHtml}
-            <div class="post-detail-description">
-                <p>${post.description}</p>
-            </div>
-            <div class="post-detail-info">
-                <div><strong>النوع:</strong> ${post.category}</div>
-                <div><strong>الموقع:</strong> ${post.location}</div>
-                <div><strong>الناشر:</strong> ${post.user_id}</div>
-            </div>
-        `;
-    }
-
-    static showError() {
-        const errorEl = document.getElementById('post-details-error');
-        if (errorEl) {
-            errorEl.style.display = 'block';
-        }
-    }
-    }
         const imageHtml = post.image_url 
             ? `<img src="${post.image_url}" alt="${post.name}" class="post-detail-image">`
             : `<div class="post-detail-image no-image">
@@ -58,7 +38,7 @@ class PostDetails {
 
         contentEl.innerHTML = `
             <div class="post-detail-header">
-                <h2 class="post-detail-title">${post.name || 'بدون عنوان'}</h2>
+                <h2 class="post-detail-title">${post.name}</h2>
                 <span class="post-detail-price">${Utils.formatPrice(post.price)}</span>
             </div>
             
@@ -66,19 +46,19 @@ class PostDetails {
             
             <div class="post-detail-description">
                 <h3><i class="fas fa-align-left"></i> الوصف:</h3>
-                <p>${post.description || 'لا يوجد وصف'}</p>
+                <p>${post.description}</p>
             </div>
             
             <div class="post-detail-info">
                 <div class="detail-item">
                     <i class="fas fa-tag"></i>
                     <strong>النوع:</strong>
-                    <span>${post.category || 'غير محدد'}</span>
+                    <span>${post.category}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <strong>الموقع:</strong>
-                    <span>${post.location || 'غير محدد'}</span>
+                    <span>${post.location}</span>
                 </div>
                 <div class="detail-item">
                     <i class="fas fa-user"></i>
@@ -88,7 +68,7 @@ class PostDetails {
                 <div class="detail-item">
                     <i class="fas fa-calendar"></i>
                     <strong>تاريخ النشر:</strong>
-                    <span>${post.created_at ? new Date(post.created_at).toLocaleString('ar-SA') : 'غير معروف'}</span>
+                    <span>${new Date(post.created_at).toLocaleString('ar-SA')}</span>
                 </div>
             </div>
             
@@ -110,7 +90,6 @@ class PostDetails {
     }
 
     static showError() {
-        console.error('❌ عرض خطأ تفاصيل المنشور');
         const contentEl = document.getElementById('post-details-content');
         const errorEl = document.getElementById('post-details-error');
         
@@ -127,18 +106,17 @@ class PostDetails {
             return;
         }
 
+        // هنا يمكنك إضافة منطق الطلب (إرسال إيميل، رسالة، إلخ)
         const message = `طلب على المنتج: ${post.name}\nالسعر: ${Utils.formatPrice(post.price)}\nصاحب المنشور: ${post.user_id}`;
         
         Utils.showStatus('تم إرسال طلبك بنجاح! سيتم التواصل معك قريباً', 'success');
         console.log('تفاصيل الطلب:', message);
+        
+        // يمكنك إضافة API لإرسال الإشعارات هنا
     }
 
     static initPage() {
-        console.log('✅ تهيئة صفحة تفاصيل المنشور');
+        // هذه الدالة تستدعى عند تحميل الصفحة
+        console.log('تهيئة صفحة تفاصيل المنشور');
     }
 }
-
-// التأكد من أن الكلاس معرف عالمياً
-if (typeof window !== 'undefined') {
-    window.PostDetails = PostDetails;
-        }
